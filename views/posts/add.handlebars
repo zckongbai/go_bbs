@@ -1,0 +1,64 @@
+{{> header }}
+
+<!-- form begin -->
+<div>
+    <form id="addFm" action="{{ addUrl }}" method="POST">
+
+        标题: <input type="text" name="title" id="title" value="" /><br /><br />
+
+        内容: <textarea name="content" id="content" rows="10" cols="30"></textarea><br /><br />
+
+        <input type="button" onclick="addPost()" value="发帖" id="addBtn" />
+
+    </form>
+</div>
+<!-- form end -->
+
+
+<script>
+    function addPost() {
+        if (false == checkForm()) {
+            return false;
+        }
+        if ($('#addBtn').val() == "发帖") {
+            $('#addBtn').val('正在发帖');
+            $.ajax({
+                type: "POST",
+                url: "{{ addUrl }}",
+                data: $('#addFm').serialize(),
+                dataType: "json",
+                success: function (msg) {
+                    alert(msg.message);
+                    if (msg.code == 0){
+                        return window.location.href = msg.redirectUrl;
+                    }
+                }
+            });
+
+            $('#addBtn').val('发帖');
+        }
+    }
+
+    /**
+     * 检查表单字段
+     */
+    function checkForm() {
+
+        if (!$('#title').val()){
+            alert('标题不能为空');
+            $('#title').focus();
+            return false;
+        }
+
+        if ($('#content').val() == ''){
+            alert('内容不能为空');
+            $('#content').focus();
+            return false;
+        }
+
+        return true;
+    }
+
+</script>
+
+{{> footer }}

@@ -1,0 +1,21 @@
+{{>header}}
+
+<div>
+    <span>出错了: {{message}}</span>
+    <span><a href="/home">回首页</a></span>
+    <span id="show"></span>
+</div>
+
+<script>
+    var t=3;//设定跳转的时间
+    setInterval("refer()",1000); //启动1秒定时
+    function refer(){
+        if(t==0){
+            location="{{redirectUrl}}"; //#设定跳转的链接地址
+        }
+        document.getElementById('show').innerHTML=""+t+"秒后跳转到{{redirectName}}"; // 显示倒计时
+        t--; // 计数器递减
+    }
+</script>
+
+{{>footer}}

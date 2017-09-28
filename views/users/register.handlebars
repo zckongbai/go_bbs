@@ -1,0 +1,91 @@
+{{> header }}
+<div class="row">
+  <h1>Hello, go.</h1>
+</div>
+
+<!-- 注册 begin -->
+<div>
+    <p>注册。</p>
+
+    <form id="registerFm" action="{{ registerUrl }}" method="post">
+        名称: <input type="text" name="name" id="name" value="" /><br />
+        邮箱: <input type="email" name="email" id="email" value="" /><br />
+        密码: <input type="password" minlength="6" maxlength="32" name="password" id="password"><br/>
+        确认密码: <input type="password" minlength="6" maxlength="32" name="surePassword" id="surePassword"><br/>
+        <input type="button" onclick="register()" value="注册" id="registerBtn" /><br/>
+    </form>
+    <a href="{{ loginUrl }}"><input type="button" value="去登陆" /></a>
+</div>
+<!-- 注册 end -->
+
+<script>
+
+    /**
+     * 注册
+     */
+    function register() {
+
+        if (false == checkForm()) {
+            return false;
+        }
+
+        if ($('#registerBtn').val() == "注册") {
+
+            //$('#registerFm').submit();
+            //return ;
+
+            $('#registerBtn').val('正在注册');
+            $.ajax({
+                type: "POST",
+                url: "{{ registerUrl }}",
+                data: $('#registerFm').serialize(),
+                dataType: "json",
+                success: function (msg) {
+                    alert(msg.message);
+                    if (msg.code == 0){
+                        window.location.href = msg.redirectUrl;
+                    }
+                }
+            });
+
+            $('#registerBtn').val('注册');
+        }
+    }
+
+    /**
+     * 检查form
+     * @returns {boolean}
+     */
+    function checkForm() {
+
+        if (!$('#name').val()){
+            alert('提示\n\n请输入有效的用户名！');
+            $('#name').focus();
+            return false;
+        }
+
+        // email
+        var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+        if (!myreg.test($('#email').val())){
+            alert('提示\n\n请输入有效的E_mail！');
+            $('#email').focus();
+            return false;
+        }
+
+        if (!$('#password').val()){
+            alert('提示\n\n请输入有效的密码！');
+            $('#password').focus();
+            return false;
+        }
+
+        if ($('#surePassword').val() !== $('#password').val()){
+            alert('提示\n\n两次密码不一致！');
+            $('#surePassword').focus();
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{{> footer }}

@@ -1,0 +1,31 @@
+{{> header }}
+
+<!-- hot posts begin -->
+<div>
+    <h3>热门帖子</h3>
+    <table>
+        <tr>
+            <th>标题</th>
+            <th>发表时间</th>
+            <th>点击量</th>
+            <th>回复量</th>
+            <th>查看</th>
+        </tr>
+
+        {{#each hotPosts}}
+            <tr>
+                <td>{{Title}}</td>
+                <td>{{CreatedAt}}</td>
+                <td>{{ClickNumber}}</td>
+                <td>{{ReplyNumber}}</td>
+                <td><a href="/posts/{{ID}}">查看</a></td>
+            </tr>
+        {{else}}
+            暂无发帖
+        {{/each}}
+
+    </table>
+</div>
+<!-- hot posts end -->
+
+{{> footer }}

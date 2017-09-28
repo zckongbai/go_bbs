@@ -1,0 +1,26 @@
+{{> header }}
+
+<div>
+    <table>
+        <tr>
+            <th>发帖人</th>
+            <th>标题</th>
+            <th>时间</th>
+            <th>浏览量</th>
+            <th>查看</th>
+        </tr>
+        {{#each posts}}
+            <tr>
+                <td>{{ UserId }}</td>
+                <td>{{ Title }}</td>
+                <td>{{ CreatedAt }}</td>
+                <td>{{ ClickNumber }}</td>
+                <td><a href="/posts/{{ ID }}">查看</a></td>
+            </tr>
+        {{else}}
+            <div>暂无文章, <a href="{{ addUrl }}">去添加</a></div>
+        {{/each}}
+    </table>
+</div>
+
+{{> footer }}

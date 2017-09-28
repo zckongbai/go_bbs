@@ -1,0 +1,97 @@
+{{> header }}
+
+{{#if post}}
+    <!-- 帖子内容begin -->
+    <div>
+        <u>帖子内容</u>
+        <ul>
+            <li>用户:<span>{{ post.User.Name }}</span></li>
+            <li>标题:<span>{{ post.Title }}</span></li>
+            <li>内容:<section>{{ post.Content }}</section></li>
+            <li>浏览量:<section>{{ post.ClickNumber }}</section></li>
+            <li>时间:<time>{{ post.CreatedAt }}</time></li>
+        </ul>
+    </div>
+    <!-- 帖子内容end -->
+
+    {{#if post.Replis}}
+        <!-- 回贴列表begin -->
+        <div>
+            <u>回复列表</u>
+            <table>
+                <tr>
+                    <td>用户名</td>
+                    <td>内容</td>
+                    <td>楼层</td>
+                    <td>时间</td>
+                </tr>
+                {{#each post.Replis}}
+                <tr>
+                    <td>{{ User.Name }}</td>
+                    <td>{{ Content }}</td>
+                    <td>{{ Floor }}</td>
+                    <td>{{ CreatedAt }}</td>
+                </tr>
+                {{/each}}
+            </table>
+        </div>
+    {{else}}
+        暂无回复
+    {{/if}}
+    <!-- 回贴列表end -->
+
+    <!-- 回复begin -->
+    <div>
+        <u>发表回复</u>
+        <form action="{{ replyUrl }}" id="addFm" method="post">
+            <input type="hidden" name="post_id" value="{{ post.ID }}">
+            <textarea name="content" id="content" cols="30" rows="10"></textarea> <span id="conError"></span>
+            <br>
+            <input type="button" onclick="addReply()" value="提交" id="addBtn">
+        </form>
+    </div>
+    <!-- 回复end -->
+
+{{else}}
+    <div>文章不存在</div>
+{{/if}}
+
+<script>
+
+    function addReply() {
+        if (false == checkForm()) {
+            return false;
+        }
+        if ($('#addBtn').val() == "提交") {
+            $('#addBtn').val('正在提交');
+            $.ajax({
+                type: "POST",
+                url: "{{ replyUrl }}",
+                data: $('#addFm').serialize(),
+                dataType: "json",
+                success: function (msg) {
+                    console.log(msg)
+                    alert(msg.message);
+                    if (msg.code == 0){
+                        return window.location.href = msg.redirectUrl;
+                    }
+                }
+            });
+
+            $('#addBtn').val('提交');
+        }
+    }
+    /**
+     * 校验form
+     * @returns {boolean}
+     */
+    function checkForm() {
+        if (!$('#content').val()){
+            $('#conError').html('内容不能为空');
+            return false;
+        }
+        return true;
+
+    }
+</script>
+{{> footer }}

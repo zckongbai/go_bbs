@@ -1,0 +1,69 @@
+{{>header}}
+
+<!-- 更新 begin -->
+<div>
+    <form id="updateFm" action="{{ updateUrl }}" method="POST">
+
+        标题: <input type="hidden" name="id" value="{{post.ID}}" />
+        标题: <input type="text" name="title" id="title" value="{{post.Title}}" /><br /><br />
+
+        内容: <textarea name="content" id="content" rows="10" cols="30">{{post.Content}}</textarea><br /><br />
+
+        <input type="button" onclick="updatePost()" value="更新" id="updateBtn" />
+
+    </form>
+</div>
+<!-- 更新 end -->
+
+
+
+
+<script>
+    function updatePost() {
+        if (false == checkForm()) {
+            return false;
+        }
+        if ($('#updateBtn').val() == "更新") {
+            $('#updateBtn').val('正在更新');
+            return $('#updateFm').submit();
+
+            $.ajax({
+                type: "POST",
+                url: "{{ updateUrl }}",
+                data: $('#updateFm').serialize(),
+                dataType: "json",
+                success: function (msg) {
+                    alert(msg.message);
+                    if (msg.code == 0){
+                        return window.location.href = msg.redirectUrl;
+                    }
+                }
+            });
+            $('#updateBtn').val('更新');
+        }
+    }
+
+    /**
+     * 检查表单字段
+     */
+    function checkForm() {
+
+        if (!$('#title').val()){
+            alert('标题不能为空');
+            $('#title').focus();
+            return false;
+        }
+
+        if ($('#content').val() == ''){
+            alert('内容不能为空');
+            $('#content').focus();
+            return false;
+        }
+
+        return true;
+    }
+
+</script>
+
+
+{{>footer}}

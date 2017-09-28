@@ -1,0 +1,36 @@
+{{>header}}
+{{>userLayout}}
+<!-- 发表的文章 begin -->
+<div>
+    {{#if posts}}
+ <table>
+     <tr>
+         <th>标题</th>
+         <th>浏览量</th>
+         <th>回帖数</th>
+         <th>最近回帖时间</th>
+         <th>创建时间</th>
+         <th>操作</th>
+     </tr>
+
+     {{#each posts}}
+         <tr>
+             <td>{{Title}}</td>
+             <td>{{ClickNumber}}</td>
+             <td>{{ReplyNumber}}</td>
+             <td>{{LastReplyAt}}</td>
+             <td>{{CreatedAt}}</td>
+             <td>
+                 <a href="/posts/{{ID}}">查看</a>
+                 <a href="/posts/update/{{ID}}">修改</a>
+             </td>
+         </tr>
+     {{/each}}
+
+ </table>
+        {{else}}
+        暂无发表文章, <a href="{{addPostUrl}}">去发帖</a>
+        {{/if}}
+</div>
+<!-- 发表的文章 end -->
+{{>footer}}
