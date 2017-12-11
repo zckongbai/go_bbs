@@ -12,7 +12,7 @@ import (
 // HomeController
 type HomeController struct {
 	// Uncomment this line if you want to use services in the app
-	 app *gopress.App
+	app *gopress.App
 	db  *services.DatabaseService
 }
 

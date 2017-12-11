@@ -4,9 +4,9 @@ import (
 	"go_bbs/controllers"
 
 	"github.com/fpay/gopress"
-	"go_bbs/services"
-	"go_bbs/middlewares"
 	. "go_bbs/conf"
+	"go_bbs/middlewares"
+	"go_bbs/services"
 )
 
 func main() {
@@ -17,10 +17,10 @@ func main() {
 	})
 
 	// init and register services
-	 s.RegisterServices(
-	 	services.NewDatabaseService(),
+	s.RegisterServices(
+		services.NewDatabaseService(),
 		services.NewCacheService(),
-	 )
+	)
 
 	// register middlewares
 	s.RegisterGlobalMiddlewares(

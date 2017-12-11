@@ -47,9 +47,9 @@ type app struct {
 }
 
 type server struct {
-	Graceful bool   `toml:"graceful"`
+	Graceful bool `toml:"graceful"`
 	//Addr     string `toml:"addr"`
-	Addr     int `toml:"addr"`
+	Addr int `toml:"addr"`
 
 	DomainApi    string `toml:"domain_api"`
 	DomainWeb    string `toml:"domain_web"`

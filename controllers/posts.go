@@ -4,39 +4,39 @@ import (
 	"net/http"
 
 	"github.com/fpay/gopress"
-	"go_bbs/services"
-	"go_bbs/models"
-	"gopkg.in/go-playground/validator.v9"
-	"github.com/leebenson/conform"
-	"strconv"
-	"go_bbs/helpers"
-	"time"
 	"github.com/garyburd/redigo/redis"
+	"github.com/leebenson/conform"
+	"go_bbs/helpers"
+	"go_bbs/models"
+	"go_bbs/services"
+	"gopkg.in/go-playground/validator.v9"
+	"strconv"
+	"time"
 )
 
 // PostsController
 type PostsController struct {
 	// Uncomment this line if you want to use services in the app
-	app *gopress.App
-	db *services.DatabaseService
-	cache *services.CacheService
-	helper *helpers.Common
+	app       *gopress.App
+	db        *services.DatabaseService
+	cache     *services.CacheService
+	helper    *helpers.Common
 	validator *validator.Validate
 }
 
 type (
 	addPostData struct {
-		Title  string `json:"title" form:"title" validate:"required,lt=64" conform:"trim"`
+		Title   string `json:"title" form:"title" validate:"required,lt=64" conform:"trim"`
 		Content string `json:"content" form:"content" validate:"required" conform:"trim"`
 	}
 	updatePostData struct {
-		ID  string `json:"id" form:"id" validate:"required" conform:"trim"`
-		Title  string `json:"title" form:"title" validate:"required,lt=64" conform:"trim"`
+		ID      string `json:"id" form:"id" validate:"required" conform:"trim"`
+		Title   string `json:"title" form:"title" validate:"required,lt=64" conform:"trim"`
 		Content string `json:"content" form:"content" validate:"required" conform:"trim"`
 	}
 
 	addReplyData struct {
-		PostId  int `json:"post_id" form:"post_id" validate:"required" conform:"trim"`
+		PostId  int    `json:"post_id" form:"post_id" validate:"required" conform:"trim"`
 		Content string `json:"content" form:"content" validate:"required" conform:"trim"`
 	}
 )
@@ -71,12 +71,12 @@ func (c *PostsController) IndexGetAction(ctx gopress.Context) error {
 
 	//pindex := int(ctx.QueryParam("p"))
 	//if pindex == 0 {
-		pindex := 1
+	pindex := 1
 	//}
 	psize := 10
 	data := map[string]interface{}{}
 	posts := []models.Post{}
-	c.db.DB.Limit(psize).Offset((pindex - 1 ) * psize).Find(&posts).Rows()
+	c.db.DB.Limit(psize).Offset((pindex - 1) * psize).Find(&posts).Rows()
 	//ctx.Logger().Info("res:", res)
 	ctx.Logger().Info("posts:", posts)
 	data["posts"] = posts
@@ -87,7 +87,7 @@ func (c *PostsController) IndexGetAction(ctx gopress.Context) error {
 func (c *PostsController) AddGetAction(ctx gopress.Context) error {
 
 	data := map[string]interface{}{
-		"title" : "添加文章",
+		"title":  "添加文章",
 		"addUrl": "/posts/doAdd",
 	}
 	return ctx.Render(http.StatusOK, "posts/add", data)
@@ -126,8 +126,8 @@ func (c *PostsController) DoAddPostAction(ctx gopress.Context) error {
 	}
 	uid, _ := strconv.Atoi(cookie.Value)
 	post := models.Post{
-		UserId: uid,
-		Title: addData.Title,
+		UserId:  uid,
+		Title:   addData.Title,
 		Content: addData.Content,
 	}
 
@@ -139,7 +139,7 @@ func (c *PostsController) DoAddPostAction(ctx gopress.Context) error {
 
 	data["code"] = 0
 	data["message"] = "添加成功"
-	data["redirectUrl"] = "/posts/"+strconv.Itoa(int(post.ID))
+	data["redirectUrl"] = "/posts/" + strconv.Itoa(int(post.ID))
 	return ctx.JSON(http.StatusOK, data)
 }
 
@@ -175,7 +175,7 @@ func (c *PostsController) updatePostClickNumber(ctx gopress.Context, post *model
 	var key string
 	uidCookie, err := ctx.Cookie("uid")
 	if err == nil {
-		uid,_ := strconv.Atoi(uidCookie.Value)
+		uid, _ := strconv.Atoi(uidCookie.Value)
 		if uid == post.UserId {
 			return false
 		}
@@ -184,7 +184,7 @@ func (c *PostsController) updatePostClickNumber(ctx gopress.Context, post *model
 		ip := ctx.RealIP()
 		key = "view:" + strconv.Itoa(int(post.ID)) + "|" + ip
 	}
-	if has,_ := redis.Bool(c.cache.Redis.Do("EXISTS", key)); has == true {
+	if has, _ := redis.Bool(c.cache.Redis.Do("EXISTS", key)); has == true {
 		return false
 	}
 	// 3分钟间隔
@@ -231,11 +231,11 @@ func (c *PostsController) AddReplyPostAction(ctx gopress.Context) error {
 	post.LastReplyAt = time.Now()
 
 	reply := models.Reply{
-		PostId: addData.PostId,
+		PostId:    addData.PostId,
 		PostTitle: post.Title,
-		UserId: uid,
-		Floor: post.ReplyNumber,
-		Content : addData.Content,
+		UserId:    uid,
+		Floor:     post.ReplyNumber,
+		Content:   addData.Content,
 	}
 
 	err1 := tran.Create(&reply).GetErrors()
@@ -244,7 +244,7 @@ func (c *PostsController) AddReplyPostAction(ctx gopress.Context) error {
 		tran.Commit()
 		data["code"] = 0
 		data["message"] = "添加评论成功"
-		data["redirectUrl"] = "/posts/"+ strconv.Itoa(addData.PostId)
+		data["redirectUrl"] = "/posts/" + strconv.Itoa(addData.PostId)
 		return ctx.JSON(http.StatusOK, data)
 	}
 	ctx.Logger().Info("sqlerr1:", err1)
@@ -275,7 +275,7 @@ func (c *PostsController) UpdateGetAction(ctx gopress.Context) error {
 		return ctx.Render(http.StatusOK, "common/error", data)
 	}
 
-	uid,_ := strconv.Atoi(cookie.Value)
+	uid, _ := strconv.Atoi(cookie.Value)
 
 	if uid != post.UserId {
 		data["message"] = "非法访问"
@@ -292,8 +292,8 @@ func (c *PostsController) UpdateGetAction(ctx gopress.Context) error {
 func (c *PostsController) DoUpdatePostAction(ctx gopress.Context) error {
 	id := ctx.FormValue("id")
 	data := map[string]interface{}{
-		"redirectUrl" : "/posts/"+id,
-		"redirectName" : "查看文章",
+		"redirectUrl":  "/posts/" + id,
+		"redirectName": "查看文章",
 	}
 
 	if c.addLimit(ctx) == false {
@@ -323,7 +323,7 @@ func (c *PostsController) DoUpdatePostAction(ctx gopress.Context) error {
 		return ctx.Render(http.StatusOK, "common/error", data)
 	}
 	cookie, _ := ctx.Cookie("uid")
-	uid,_ := strconv.Atoi(cookie.Value)
+	uid, _ := strconv.Atoi(cookie.Value)
 
 	if uid != post.UserId {
 		data["message"] = "非法访问"

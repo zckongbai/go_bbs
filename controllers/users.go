@@ -10,35 +10,35 @@ import (
 	"go_bbs/services"
 
 	"github.com/fpay/gopress"
-	"gopkg.in/go-playground/validator.v9"
+	"github.com/garyburd/redigo/redis"
 	"github.com/leebenson/conform"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/garyburd/redigo/redis"
-	"time"
+	"gopkg.in/go-playground/validator.v9"
 	"strconv"
+	"time"
 )
 
 // UsersController
 type UsersController struct {
 	// Uncomment this line if you want to use services in the app
-	app *gopress.App
-	db  *services.DatabaseService
-	cache *services.CacheService
-	helper *helpers.Common
+	app       *gopress.App
+	db        *services.DatabaseService
+	cache     *services.CacheService
+	helper    *helpers.Common
 	validator *CustomValidator
-	user *models.User
+	user      *models.User
 }
 
 type (
 	userRegisterData struct {
-		Name  string `json:"name" form:"name" validate:"required,lt=32" conform:"trim"`
-		Email string `json:"email" form:"email" validate:"required,email" conform:"trim"`
-		Password string `json:"password" form:"password" validate:"required,gt=3,lt=32" conform:"trim"`
+		Name         string `json:"name" form:"name" validate:"required,lt=32" conform:"trim"`
+		Email        string `json:"email" form:"email" validate:"required,email" conform:"trim"`
+		Password     string `json:"password" form:"password" validate:"required,gt=3,lt=32" conform:"trim"`
 		SurePassword string `json:"surePassword" form:"surePassword" validate:"required" conform:"trim"`
 	}
 
 	userLoginData struct {
-		Name  string `json:"name" form:"name" validate:"required,lt=32" conform:"trim"`
+		Name     string `json:"name" form:"name" validate:"required,lt=32" conform:"trim"`
 		Password string `json:"password" form:"password" validate:"required,gt=3,lt=32" conform:"trim"`
 	}
 
@@ -89,20 +89,20 @@ func (c *UsersController) IndexGetAction(ctx gopress.Context) error {
 func (c *UsersController) getUser(ctx gopress.Context) *models.User {
 	cookie, err := ctx.Cookie("uid")
 	if err != nil {
-		return  nil
+		return nil
 	}
 	user := &models.User{}
 	uid, _ := strconv.Atoi(cookie.Value)
 	if c.db.DB.First(user, uid).RowsAffected == 0 {
-		return  nil
+		return nil
 	}
 	return user
 }
 
 func (c *UsersController) LoginGetAction(ctx gopress.Context) error {
 	data := map[string]interface{}{
-		"loginUrl" : "/users/doLogin",
-		"registerUrl" : "/users/register",
+		"loginUrl":    "/users/doLogin",
+		"registerUrl": "/users/register",
 	}
 	return ctx.Render(http.StatusOK, "users/login", data)
 }
@@ -115,7 +115,7 @@ func (c *UsersController) DoLoginPostAction(ctx gopress.Context) error {
 		data["message"] = "登录太频繁,5分钟再试"
 		return ctx.JSON(http.StatusOK, data)
 	}
-	
+
 	userData := new(userLoginData)
 	var err error
 	if err = ctx.Bind(userData); err != nil {
@@ -162,7 +162,7 @@ func (c *UsersController) loginLimit(ctx gopress.Context) bool {
 	loginTime, _ := redis.Int(c.cache.Redis.Do("INCR", key))
 	c.cache.Redis.Do("EXPIRE", key, 300)
 
-	data :=  map[string]interface{}{"ip":ip, "loginTime":loginTime}
+	data := map[string]interface{}{"ip": ip, "loginTime": loginTime}
 	ctx.Logger().Info("loginLimit:", data)
 
 	if loginTime <= 3 {
@@ -173,8 +173,8 @@ func (c *UsersController) loginLimit(ctx gopress.Context) bool {
 
 func (c *UsersController) RegisterGetAction(ctx gopress.Context) error {
 	data := map[string]interface{}{
-		"loginUrl" : "/users/doLogin",
-		"registerUrl" : "/users/doRegister",
+		"loginUrl":    "/users/doLogin",
+		"registerUrl": "/users/doRegister",
 	}
 	return ctx.Render(http.StatusOK, "users/register", data)
 }
@@ -200,8 +200,8 @@ func (c *UsersController) DoRegisterPostAction(ctx gopress.Context) error {
 	}
 
 	user := models.User{
-		Name:      userData.Name,
-		Email:     userData.Email,
+		Name:  userData.Name,
+		Email: userData.Email,
 	}
 	if has := c.db.DB.Where("name = ?", user.Name).First(&user).RowsAffected; has != 0 {
 		data["code"] = 4003
@@ -260,8 +260,8 @@ func (c *UsersController) PostsGetAction(ctx gopress.Context) error {
 
 	c.db.DB.Model(user).Related(&user.Posts)
 	data := map[string]interface{}{
-		"posts" : user.Posts,
-		"addPostUrl" : "/posts/add",
+		"posts":      user.Posts,
+		"addPostUrl": "/posts/add",
 	}
 	return ctx.Render(http.StatusOK, "users/posts", data)
 }

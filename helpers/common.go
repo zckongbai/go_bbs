@@ -10,10 +10,9 @@ import (
 )
 
 type Common struct {
-
 }
 
-func (c Common) DateTime() string  {
+func (c Common) DateTime() string {
 
 	var t int64 = time.Now().Unix()
 	var s string = time.Unix(t, 0).Format("2006-01-02 15:04:05")
@@ -23,9 +22,9 @@ func (c Common) DateTime() string  {
 func (c Common) PasswrodEncode(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return  "", err
+		return "", err
 	}
-	return  string(hash), nil
+	return string(hash), nil
 
 }
 
@@ -36,7 +35,6 @@ func (c Common) Md5String(str string) string {
 	return hex.EncodeToString(cipherStr)
 }
 
-func (c Common) addError(name string, value string)  {
+func (c Common) addError(name string, value string) {
 
 }
-
